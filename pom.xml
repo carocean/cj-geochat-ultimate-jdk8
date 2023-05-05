@@ -23,6 +23,7 @@
         <org.aspectj.version>1.9.9.1</org.aspectj.version>
         <spring-cloud.version>2021.0.2</spring-cloud.version>
         <spring-cloud-security-dependenceis.version>2.2.5.RELEASE</spring-cloud-security-dependenceis.version>
+        <ulid-creator.version>5.1.0</ulid-creator.version>
     </properties>
     <!--用于根据环境切换属性。如部署时：deploy -P release此时会选择配置的release环境的属性-->
     <profiles>
@@ -86,6 +87,12 @@
                 <version>${spring-cloud-security-dependenceis.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.github.f4b6a3/ulid-creator -->
+            <dependency>
+                <groupId>com.github.f4b6a3</groupId>
+                <artifactId>ulid-creator</artifactId>
+                <version>${ulid-creator.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -3,6 +3,7 @@ package cj.geochat.ability.oauth2.config;
 import cj.geochat.ability.oauth2.DefaultWebRequestInterceptor;
 import cj.geochat.ability.oauth2.filter.DefaultClientCredentialsTokenEndpointFilter;
 import cj.geochat.ability.oauth2.properties.SecurityProperties;
+import com.github.f4b6a3.ulid.UlidCreator;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,6 +46,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     UserDetailsService userDetailsService;
     @Autowired
     SecurityProperties securityProperties;
+
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
 
@@ -93,8 +95,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     private TokenGranter tokenGranter(final AuthorizationServerEndpointsConfigurer endpoints) {
         List<TokenGranter> granters = new ArrayList<>(Arrays.asList(endpoints.getTokenGranter()));// 获取默认的granter集合
         granters.addAll(
-                securityWorkbin.grantTypeAuthenticationFactory().getTokenGranters(authenticationManager,endpoints)
-                );
+                securityWorkbin.grantTypeAuthenticationFactory().getTokenGranters(authenticationManager, endpoints)
+        );
         return new CompositeTokenGranter(granters);
     }
 
@@ -112,6 +114,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     }
 
     private String createNewToken() {
-        return DigestUtils.md5Hex(UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8));
+        return UlidCreator.getMonotonicUlid().toLowerCase();
     }
 }

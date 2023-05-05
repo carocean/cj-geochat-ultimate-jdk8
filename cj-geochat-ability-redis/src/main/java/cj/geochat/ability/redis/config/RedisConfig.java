@@ -73,7 +73,7 @@ public class RedisConfig {
      * sentinel 哨兵模式configuration
      */
     @Bean
-    @ConditionalOnProperty(value = "spring.data.redis.mode", havingValue = "sentinel")
+    @ConditionalOnProperty(value = "spring.redis.mode", havingValue = "sentinel")
     public RedisSentinelConfiguration redisConfigurationModeSentinel() {
         RedisSentinelConfiguration redisConfig = new RedisSentinelConfiguration();
         redisConfig.setMaster(redisProperties.getSentinel().getMaster());
@@ -95,7 +95,7 @@ public class RedisConfig {
      * singleten单机 模式configuration
      */
     @Bean
-    @ConditionalOnProperty(value = "spring.data.redis.mode", havingValue = "singleten")
+    @ConditionalOnProperty(value = "spring.redis.mode", havingValue = "singleten")
     public RedisStandaloneConfiguration redisConfigurationModeSingleten() {
 
         RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration();
@@ -111,7 +111,7 @@ public class RedisConfig {
      * cluster 模式configuration
      */
     @Bean
-    @ConditionalOnProperty(value = "spring.data.redis.mode", havingValue = "cluster")
+    @ConditionalOnProperty(value = "spring.redis.mode", havingValue = "cluster")
     public RedisClusterConfiguration redisClusterConfigurationModeCluster() {
 
         RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration(redisProperties.getCluster().getNodes());
@@ -123,7 +123,7 @@ public class RedisConfig {
      * singleten单机 模式redisConnectionFactory
      */
     @Bean("redisConnectionFactory")
-    @ConditionalOnProperty(value = "spring.data.redis.mode", havingValue = "singleten")
+    @ConditionalOnProperty(value = "spring.redis.mode", havingValue = "singleten")
     public LettuceConnectionFactory redisConnectionFactoryModeSingleten(@Qualifier("poolConfig") GenericObjectPoolConfig config,
                                                                         RedisStandaloneConfiguration redisStandaloneConfiguration) {//注意传入的对象名和类型RedisSentinelConfiguration
         LettuceClientConfiguration clientConfiguration = LettucePoolingClientConfiguration.builder().poolConfig(config).build();
@@ -135,7 +135,7 @@ public class RedisConfig {
      * sentinel哨兵 模式redisConnectionFactory
      */
     @Bean("redisConnectionFactory")
-    @ConditionalOnProperty(value = "spring.data.redis.mode", havingValue = "sentinel")
+    @ConditionalOnProperty(value = "spring.redis.mode", havingValue = "sentinel")
     public LettuceConnectionFactory redisConnectionFactoryModeSentinel(@Qualifier("poolConfig") GenericObjectPoolConfig config,
                                                                        RedisSentinelConfiguration redisConfig) {//注意传入的对象名和类型RedisSentinelConfiguration
         LettuceClientConfiguration clientConfiguration = LettucePoolingClientConfiguration.builder().poolConfig(config).build();
@@ -147,7 +147,7 @@ public class RedisConfig {
      * cluster 模式redisConnectionFactory
      */
     @Bean("redisConnectionFactory")
-    @ConditionalOnProperty(value = "spring.data.redis.mode", havingValue = "cluster")
+    @ConditionalOnProperty(value = "spring.redis.mode", havingValue = "cluster")
     public LettuceConnectionFactory redisConnectionFactoryModeCluster(RedisClusterConfiguration redisClusterConfiguration) {
 
         ClusterTopologyRefreshOptions clusterTopologyRefreshOptions = ClusterTopologyRefreshOptions.builder()

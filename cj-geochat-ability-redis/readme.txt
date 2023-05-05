@@ -1,5 +1,4 @@
 spring:
-  data:
     redis:
       mode: sentinel
       password: 123456

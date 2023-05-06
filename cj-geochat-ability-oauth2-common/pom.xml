@@ -21,6 +21,11 @@
     <dependencies>
         <dependency>
             <groupId>cj.geochat</groupId>
+            <artifactId>cj-geochat-ability-banner</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>cj.geochat</groupId>
             <artifactId>cj-geochat-ability-web</artifactId>
             <version>${cj.geochat.ability.web.version}</version>
         </dependency>

@@ -26,13 +26,49 @@
             <version>${cj-geochat-ability-oauth2-common.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-oauth2</artifactId>
+            <groupId>cj.geochat</groupId>
+            <artifactId>cj-geochat-ability-eureka</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- **************************************************** -->
+        <!-- 下面是在mac m1/m2芯片上解决在webFlux机制下与redis冲突导致的dns不能解析问题，需排除actuator -->
+        <dependency>
+            <groupId>cj.geochat</groupId>
+            <artifactId>cj-geochat-ability-config</artifactId>
+            <type>pom</type>
+            <version>1.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-actuator</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-oauth2</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-actuator</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        <!--解决mac m1/m2冲突配置结束-->
+        <!-- **************************************************** -->
+        <!--发布到非mac arm64芯片采用此依赖-->
+<!--        <dependency>-->
+<!--            <groupId>cj.geochat</groupId>-->
+<!--            <artifactId>cj-geochat-ability-config</artifactId>-->
+<!--            <type>pom</type>-->
+<!--            <version>1.0.0</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-oauth2</artifactId>-->
+<!--        </dependency>-->
+        <!--以上发布到非mac arm64芯片采用此依赖:结束配置-->
+        <!-- **************************************************** -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
@@ -46,10 +82,6 @@
             <artifactId>cj-geochat-ability-redis</artifactId>
             <version>${cj-geochat-ability-redis.version}</version>
         </dependency>
-        <!--        <dependency>-->
-<!--            <groupId>org.springframework.security.oauth</groupId>-->
-<!--            <artifactId>spring-security-oauth2</artifactId>-->
-<!--        </dependency>-->
     </dependencies>
 
     <build>

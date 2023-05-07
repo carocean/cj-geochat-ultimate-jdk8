@@ -75,6 +75,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().successHandler(successHandler).failureHandler(failureHandler)
+                .and().headers().frameOptions().disable()
                 .and()
                 .logout().logoutSuccessHandler(securityWorkbin.logoutSuccessHandler()).clearAuthentication(true).permitAll()
         ;

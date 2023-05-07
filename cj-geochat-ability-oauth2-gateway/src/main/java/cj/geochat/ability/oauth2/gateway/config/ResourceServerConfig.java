@@ -49,6 +49,7 @@ public class ResourceServerConfig {
         allWhitelist.addAll(staticResources);
         http.cors().and().csrf().disable()
                 .logout().logoutUrl("/logout").logoutSuccessHandler(securityWorkbin.serverLogoutSuccessHandler())//logout默认以post提交,可以参考修改：.requiresLogout(new PathRequestMatcher("/logout", "GET"))
+                .and().headers().frameOptions().disable()
                 .and()
                 .exceptionHandling()
                 .accessDeniedHandler(securityWorkbin.accessDeniedHandler())

@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.ArrayList;
 import java.util.List;
 
-@ConfigurationProperties("server.security")
+@ConfigurationProperties("spring.security")
 @Setter
 @Getter
 public class SecurityProperties {

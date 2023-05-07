@@ -20,9 +20,9 @@ import org.springframework.security.web.authentication.*;
 import java.util.List;
 
 /**
- * /oauth/authorize:      验证
- * /oauth/token:          获取token
- * /oauth/confirm_access: 用户授权
+ * /oauth/authorize:      专用于授权码模式。两个功能：1、发放授权码（需先登录）；2、检测是否需要用户授权并重定向到授权页然后处理用户向其提交的授权页确认结果。注意：申请授权码的客户端如果开启了用户授权确认，oauth2会发起重定向请求/oauth/confirm_access，因此可拦截此请求返回协议形式，让客户端自定用户确认页面
+ * /oauth/token:          获取token（无论是通过授权码或自定义授权模式都要调此接口以换取或获取令牌）
+ * /oauth/confirm_access: 用户授权页
  * /oauth/error:          认证失败
  * /oauth/check_token:    资源服务器用来校验token
  * /oauth/token_key:      如果jwt模式则可以用此来从认证服务器获取公钥

@@ -16,7 +16,6 @@
     <description>cj-geochat-ability-api</description>
     <properties>
         <java.version>1.8</java.version>
-        <cj.geochat.ability.web.version>1.0.0</cj.geochat.ability.web.version>
     </properties>
     <dependencies>
         <dependency>
@@ -26,7 +25,7 @@
         <dependency>
             <groupId>cj.geochat</groupId>
             <artifactId>cj-geochat-ability-web</artifactId>
-            <version>${cj.geochat.ability.web.version}</version>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
     <build>

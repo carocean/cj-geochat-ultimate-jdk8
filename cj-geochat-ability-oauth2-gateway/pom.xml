@@ -15,15 +15,12 @@
     <description>cj-geochat-ability-oauth2-gateway</description>
     <properties>
         <java.version>1.8</java.version>
-        <cj-geochat-ability-api.version>1.0.0</cj-geochat-ability-api.version>
-        <cj-geochat-ability-oauth2-common.version>1.0.0</cj-geochat-ability-oauth2-common.version>
-        <cj-geochat-ability-redis.version>1.0.0</cj-geochat-ability-redis.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>cj.geochat</groupId>
             <artifactId>cj-geochat-ability-oauth2-common</artifactId>
-            <version>${cj-geochat-ability-oauth2-common.version}</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>cj.geochat</groupId>
@@ -81,7 +78,7 @@
         <dependency>
             <groupId>cj.geochat</groupId>
             <artifactId>cj-geochat-ability-redis</artifactId>
-            <version>${cj-geochat-ability-redis.version}</version>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 

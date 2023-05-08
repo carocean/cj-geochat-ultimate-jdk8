@@ -15,7 +15,6 @@
     <description>cj-geochat-ability-oauth2-app</description>
     <properties>
         <java.version>1.8</java.version>
-        <cj-geochat-ability-api.version>1.0.0</cj-geochat-ability-api.version>
     </properties>
     <dependencies>
 

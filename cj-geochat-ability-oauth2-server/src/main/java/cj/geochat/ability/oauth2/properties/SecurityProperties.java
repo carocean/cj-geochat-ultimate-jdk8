@@ -11,13 +11,15 @@ import java.util.List;
 @Setter
 @Getter
 public class SecurityProperties {
-    AuthWebInfo auth_web;
+    AuthPageAddress web_auth;
+    AuthPageAddress app_auth;
     List<String> whitelist;
-    List<String> static_resources;
+    List<String> staticlist;
 
     public SecurityProperties() {
         whitelist = new ArrayList<>();
-        static_resources = new ArrayList<>();
-        auth_web = new AuthWebInfo();
+        staticlist = new ArrayList<>();
+        web_auth = new AuthPageAddress();
+        app_auth = new AuthPageAddress();
     }
 }

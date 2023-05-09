@@ -1,4 +1,4 @@
-package cj.geochat.ability.oauth2.grant.mobile;
+package cj.geochat.ability.oauth2.grant.sms;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AccountStatusException;
@@ -43,10 +43,10 @@ public class SmsCodeTokenGranter extends AbstractTokenGranter {
    protected OAuth2Authentication getOAuth2Authentication(ClientDetails client, TokenRequest tokenRequest) {
        Map<String, String> parameters = new LinkedHashMap<String, String>(tokenRequest.getRequestParameters());
        // 获取参数
-       String mobile = parameters.get("mobile");
+       String phone_num = parameters.get("phone_num");
        String smsCode = parameters.get("sms_code");
 
-       Authentication userAuth = new SmsCodeAuthenticationToken(mobile, smsCode);
+       Authentication userAuth = new SmsCodeAuthenticationToken(phone_num, smsCode);
        ((AbstractAuthenticationToken) userAuth).setDetails(parameters);
        try {
            userAuth = authenticationManager.authenticate(userAuth);
@@ -58,7 +58,7 @@ public class SmsCodeTokenGranter extends AbstractTokenGranter {
            throw new InvalidGrantException(e.getMessage());
        }
        if (userAuth == null || !userAuth.isAuthenticated()) {
-           throw new InvalidGrantException("Could not authenticate user: " + mobile);
+           throw new InvalidGrantException("Could not authenticate user: " + phone_num);
        }
 
        OAuth2Request storedOAuth2Request = getRequestFactory().createOAuth2Request(client, tokenRequest);

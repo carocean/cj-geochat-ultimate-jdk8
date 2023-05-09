@@ -1,4 +1,4 @@
-package cj.geochat.ability.oauth2.grant.mobile;
+package cj.geochat.ability.oauth2.grant.sms;
 
 import cj.geochat.ability.oauth2.grant.IGrantTypeCombin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +27,10 @@ public class SmsCodeGrantTypeCombin implements IGrantTypeCombin {
     @Override
     public AbstractAuthenticationToken tryGetAuthenticationToken(HttpServletRequest request) {
         // 获取参数
-        String mobile = request.getParameter("mobile");
+        String phone_num = request.getParameter("phone_num");
         String smsCode = request.getParameter("sms_code");
-        if (StringUtils.hasText(mobile) && StringUtils.hasText(smsCode)) {
-            return new SmsCodeAuthenticationToken(mobile, smsCode);
+        if (StringUtils.hasText(phone_num) && StringUtils.hasText(smsCode)) {
+            return new SmsCodeAuthenticationToken(phone_num, smsCode);
         }
         return null;
     }

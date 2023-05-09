@@ -1,7 +1,9 @@
 # oauth2 自定流程
 地微WEB平台授权、地微移动端授权、三方（网页或移动端）接入授权统一规范
 ## 一、关键地址
-
+参考：
+> https://blog.csdn.net/qq_33036061/article/details/107076918  
+> https://blog.csdn.net/nineya_com/article/details/129416660  
 * /oauth/authorize:      专用于授权码模式。两个功能：
 > 1、发放授权码（需先登录）；  
 > 2、检测是否需要用户授权并重定向到授权页然后处理用户向其提交的授权页确认结果。  
@@ -96,4 +98,21 @@
 > 以授权码换取token  
 > 然后小程序可通过网关访问用户信息接口了（根据Scope=userinfo来鉴权）  
 > 完成  
-## 四、用法
+## 四、用法及参数
+参见postman账户下的oauth测试脚本。
+- /login
+> 登录的最少参数与实现的认证类要求的参数一致，比如用户密码登录，只需要提供用户名、密码即可。
+- /oauth/authorize
+- 必选参数
+> client_id  
+> response_type  
+- 可选参数
+> scope 该参数可能有多个，调用者在请求授权时可指定一个子集  
+> redirect_uri 该参数可能有多个，用户者在请求授权时要么不选此参数，要么在其中选定一个要跳转的地址。
+- 用户授权确认 post /oauth/authorize
+> user_oauth_approval：必选，用户授权同意或者拒绝 true/false  
+> scope.all：可选，上一步的scope确认 true  
+- 隐式模式 /oauth/authorize
+> 与授权码模式区别：都是先登录；  
+> 区别只是在第二步：授权码请求的是response_type=code而隐式直接请求令牌response_type=token。
+> 第三步用户授权确认的区别是请求code的返回code，请求token返回token

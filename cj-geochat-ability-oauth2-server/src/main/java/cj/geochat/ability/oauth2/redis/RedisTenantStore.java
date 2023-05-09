@@ -24,4 +24,11 @@ public class RedisTenantStore implements ITenantStore {
         //保存30分钟
         redisTemplate.opsForValue().set(key, tenant_id, 30, TimeUnit.MINUTES);
     }
+
+    @Override
+    public void remoteTenant(String user, String client_id) {
+        String key = String.format(TENANT_KEY, user,client_id);
+        log.debug(String.format("移除用户:%s在client:%s上的tenant：" ,user,client_id));
+        redisTemplate.delete(key);
+    }
 }

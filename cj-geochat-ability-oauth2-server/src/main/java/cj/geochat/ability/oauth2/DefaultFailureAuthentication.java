@@ -15,6 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
+ * 登录失败会进入此类。
+ * <pre>
+ *     协议响应调用者
+ * </pre>
  * @author: cj
  * @create: 2018-12-02 09:27
  * @description:

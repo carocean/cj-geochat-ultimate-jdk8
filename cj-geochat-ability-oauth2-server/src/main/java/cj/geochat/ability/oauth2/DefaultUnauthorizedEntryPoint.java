@@ -1,6 +1,10 @@
 package cj.geochat.ability.oauth2;
 
-import cj.geochat.ability.oauth2.properties.AuthWebInfo;
+import cj.geochat.ability.api.R;
+import cj.geochat.ability.api.ResultCode;
+import cj.geochat.ability.oauth2.properties.AuthPageAddress;
+import cj.geochat.ability.oauth2.properties.SecurityProperties;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -10,36 +14,34 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * 当未登录而直接访问/oauth/authorize授权码认证端点时会进入此类
+ * <pre>告知调用者登录和用户确认页地址，让调用者去跳转。</pre>
+ */
 public class DefaultUnauthorizedEntryPoint implements AuthenticationEntryPoint {
-    String authWebLoginUrl;
+    SecurityProperties securityProperties;
 
-    public DefaultUnauthorizedEntryPoint(AuthWebInfo authWebInfo) {
-        authWebLoginUrl = String.format("%s%s", authWebInfo.getHost(), authWebInfo.getLogin_url());
+    public DefaultUnauthorizedEntryPoint(SecurityProperties securityProperties) {
+        this.securityProperties = securityProperties;
     }
+
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        //Authorization:Bearer
-        //可以写到8080，由8080告知认证服务器的登录地址，这样应用只需要知道认证后端地址就可以了
-        //如果grant_type=authorization_code 则可以省略此参数
-        //response_type:code（授权码模式下springOAuth2规定为code）
-        //response_type:token（是implicit 简化模式）
-        //response_type参数是必须的，要么是code要么是token只有这两种，只有验证码模式是code,其它包括自定义都是token
-        //response_type=token则直接返回access_token
-        //其它模式用grant_type
-        //扩展grant_type均不能访问/oauth/authorize,即不能使用授权码或简化模式的流程。扩展的授权类型只能直接向/oauth/token请求令牌
-        //implicit 简化模式/oauth/token
-        //扩展模式 grant_type：https://www.jianshu.com/p/0cb6741b9890
-        //指定刷新模式直接返回access_token:localhost:8080/oauth/token?client_id=client_id_1&client_secret=123456&grant_type=refresh_token&refresh_token=fca82077-720e-46da-9c88-c2f221b0cb46
-        //response_type=token 简化模式，等同于加上grant_type=implicit参数
-        //response_type=code 授权码模式，等同于加上grant_type=authorization_code参数
-//        String url = String.format("http://localhost:8083/login?response_type=token&client_id=client1&redirect_uri=http://localhost:8084%s&scope=all", "/home");
-        //留给登录界面来选择授权类型及响应类型
         String queryString = request.getQueryString();
-        String url = StringUtils.hasText(queryString) ? String.format("%s?%s", authWebLoginUrl, queryString) : authWebLoginUrl;
-        response.sendRedirect(url);
+        ResultCode rc = ResultCode.UNAUTHORIZED_CLIENT;
+        Map<String, Object> map = new HashMap<>();
+        map.put("web_auth", securityProperties.getWeb_auth());
+        map.put("app_auth", securityProperties.getApp_auth());
+        if (StringUtils.hasText(queryString)) {
+            map.put("queryString", queryString);
+        }
+        Object obj = R.of(rc, map);
+        response.getWriter().write(new ObjectMapper().writeValueAsString(obj));
     }
 }
 

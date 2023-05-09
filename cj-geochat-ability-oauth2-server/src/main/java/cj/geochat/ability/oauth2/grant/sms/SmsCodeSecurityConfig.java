@@ -1,4 +1,4 @@
-package cj.geochat.ability.oauth2.grant.mobile;
+package cj.geochat.ability.oauth2.grant.sms;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;

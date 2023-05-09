@@ -1,4 +1,4 @@
-package cj.geochat.ability.oauth2.grant.mobile;
+package cj.geochat.ability.oauth2.grant.sms;
 
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,7 +26,7 @@ public class SmsCodeAuthenticationProvider implements AuthenticationProvider {
         //matches方法，前面为明文，后续为加密后密文
         //匹配密码。进行密码校验
         if (passwordEncoder.matches(authentication.getCredentials().toString(), userDetails.getPassword())) {
-            return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+            return new SmsCodeAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
         }
         throw new BadCredentialsException("用户名密码不正确");
     }

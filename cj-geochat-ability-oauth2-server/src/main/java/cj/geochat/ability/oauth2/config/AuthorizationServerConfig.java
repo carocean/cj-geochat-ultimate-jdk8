@@ -54,7 +54,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         endpointFilter.afterPropertiesSet();
         endpointFilter.setAuthenticationEntryPoint(securityWorkbin.authenticationEntryPoint());
         security.allowFormAuthenticationForClients()
-                .checkTokenAccess("isAuthenticated()")
+                //要求检查token的请求必须使用access_token访问，也就是请求前已登录了
+//                .checkTokenAccess("isAuthenticated()")
+                //不需要登录即可访问检查令牌的请求
+                .checkTokenAccess("permitAll()")
 //                .tokenKeyAccess("isAuthenticated()")
                 .tokenKeyAccess("permitAll()")
                 .addTokenEndpointAuthenticationFilter(endpointFilter);
@@ -68,7 +71,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        HandlerInterceptor interceptor = new DefaultWebRequestInterceptor(securityProperties.getAuth_web());
+        HandlerInterceptor interceptor = new DefaultWebRequestInterceptor(securityProperties);
         endpoints.addInterceptor(interceptor);
         endpoints.authenticationManager(authenticationManager);
         endpoints.userDetailsService(userDetailsService);

@@ -29,9 +29,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.endpoint.CheckTokenEndpoint;
 import org.springframework.security.oauth2.provider.error.WebResponseExceptionTranslator;
+import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -105,7 +109,7 @@ public abstract class SecurityWorkbin {
 
     @Bean
     public DefaultUnauthorizedEntryPoint unauthorizedEntryPoint() {
-        return new DefaultUnauthorizedEntryPoint(securityProperties.getAuth_web());
+        return new DefaultUnauthorizedEntryPoint(securityProperties);
     }
 
     @Bean
@@ -152,4 +156,5 @@ public abstract class SecurityWorkbin {
         DefaultAuthenticationFilter filter = new DefaultAuthenticationFilter(authenticationManager);
         return filter;
     }
+
 }

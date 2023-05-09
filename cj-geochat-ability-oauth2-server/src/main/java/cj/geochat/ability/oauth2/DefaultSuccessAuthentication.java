@@ -4,7 +4,10 @@ import cj.geochat.ability.api.R;
 import cj.geochat.ability.api.ResultCode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -17,6 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 登录成功会进入此类。<br>
+ * 协议响应调用者
+ *
  * @author: cj
  * @create: 2018-12-02 09:24
  * @description:
@@ -49,7 +55,8 @@ public class DefaultSuccessAuthentication extends SavedRequestAwareAuthenticatio
         if (StringUtils.hasText(scope)) {
             map.put("scope", scope);
         }
-
+        UserDetails details=(UserDetails) authentication.getPrincipal();
+        map.put("username", details.getUsername());
         Object obj = R.of(rc, map);
         response.getWriter().write(new ObjectMapper().writeValueAsString(obj));
     }

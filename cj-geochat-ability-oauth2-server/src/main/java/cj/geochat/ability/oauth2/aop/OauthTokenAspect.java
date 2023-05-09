@@ -14,6 +14,8 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.stereotype.Component;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @description: oauth-token拦截器
@@ -45,7 +47,14 @@ public class OauthTokenAspect {
                 .body(R.of(ResultCode.SUCCESS, body));
     }
 
-
+    @Around("execution(* org.springframework.security.oauth2.provider.endpoint.CheckTokenEndpoint.checkToken(..))")
+    public Object checkToken(ProceedingJoinPoint joinPoint) throws Throwable {
+//        Object[] args = joinPoint.getArgs();
+        Object proceed = joinPoint.proceed();
+        Map<String, Object> data = (Map<String, Object>) proceed;
+        R r = R.of(ResultCode.SUCCESS, data);
+        return r.toMap();
+    }
 
 }
 

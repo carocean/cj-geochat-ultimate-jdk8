@@ -52,7 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         //"/assets/**", "/css/**", "/images/**"
-        List<String> staticResources = securityProperties.getStatic_resources();
+        List<String> staticResources = securityProperties.getStaticlist();
         web.ignoring().antMatchers(staticResources.toArray(new String[0]));
     }
 

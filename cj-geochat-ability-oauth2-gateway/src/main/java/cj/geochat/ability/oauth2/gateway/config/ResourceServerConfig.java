@@ -12,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.web.server.WebFilter;
@@ -43,13 +44,16 @@ public class ResourceServerConfig {
         http.addFilterBefore(errorWebFilter, SecurityWebFiltersOrder.FIRST);
         http.addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION);
         List<String> whitelist = securityProperties.getWhitelist();
-        List<String> staticResources = securityProperties.getStatic_resources();
+        List<String> staticResources = securityProperties.getStaticlist();
         List<String> allWhitelist = new ArrayList<>();
         allWhitelist.addAll(whitelist);
         allWhitelist.addAll(staticResources);
         http.cors().and().csrf().disable()
-                .logout().logoutUrl("/logout").logoutSuccessHandler(securityWorkbin.serverLogoutSuccessHandler())//logout默认以post提交,可以参考修改：.requiresLogout(new PathRequestMatcher("/logout", "GET"))
-                .and().headers().frameOptions().disable()
+                //拒绝匿名用户
+                .anonymous().disable()
+                //注释掉。建议使用认证中心或认证服务中心退出，网关只是访问和控制资源。
+//                .logout().logoutUrl("/logout").logoutSuccessHandler(securityWorkbin.serverLogoutSuccessHandler())//logout默认以post提交,可以参考修改：.requiresLogout(new PathRequestMatcher("/logout", "GET"))
+                .headers().frameOptions().disable()
                 .and()
                 .exceptionHandling()
                 .accessDeniedHandler(securityWorkbin.accessDeniedHandler())

@@ -7,15 +7,18 @@ import java.security.Principal;
 public class DefaultAppPrincipal implements Principal {
     String user;
     String appid;
-    String tenantid;
 
     public DefaultAppPrincipal() {
     }
 
-    public DefaultAppPrincipal(String user, String appid, String tenantid) {
+    public DefaultAppPrincipal(String user, String appid) {
         this.user = user;
         this.appid = appid;
-        this.tenantid = tenantid;
+    }
+
+
+    public String getAppid() {
+        return appid;
     }
 
     @Override
@@ -23,18 +26,9 @@ public class DefaultAppPrincipal implements Principal {
         return user;
     }
 
-    public String getAppid() {
-        return appid;
-    }
-
-    public String getTenantid() {
-        return tenantid;
-    }
-
     @Override
     public String toString() {
-        String fullName = (StringUtils.hasText(tenantid) ? tenantid + "::" : "")
-                + (StringUtils.hasText(appid) ? appid + "::" : "")
+        String fullName = (StringUtils.hasText(appid) ? appid + "::" : "")
                 + (StringUtils.hasText(user) ? user : "");
         return fullName;
     }

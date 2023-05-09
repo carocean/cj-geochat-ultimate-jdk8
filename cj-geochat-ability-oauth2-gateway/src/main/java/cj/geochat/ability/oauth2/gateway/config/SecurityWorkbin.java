@@ -5,7 +5,6 @@ import cj.geochat.ability.api.ResultCode;
 import cj.geochat.ability.oauth2.common.ResultCodeTranslator;
 import cj.geochat.ability.oauth2.gateway.*;
 import cj.geochat.ability.oauth2.gateway.properties.SecurityProperties;
-import cj.geochat.ability.oauth2.gateway.client.DefaultLookupClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -65,11 +64,6 @@ public abstract class SecurityWorkbin {
         return new RedisTokenStore(redisConnectionFactory);
     }
 
-    @Bean("customServerLogoutSuccessHandler")
-    public ServerLogoutSuccessHandler serverLogoutSuccessHandler() {
-        return new DefaultLogoutSuccessHandler(securityProperties.getAuth_server());
-    }
-
     @Bean("customAuthManagerHandler")
     public ReactiveAuthorizationManager<AuthorizationContext> authManagerHandler() {
         return new DefaultAuthManagerHandler();
@@ -77,12 +71,12 @@ public abstract class SecurityWorkbin {
 
     @Bean("customAccessDeniedHandler")
     public DefaultAccessDeniedHandler accessDeniedHandler() {
-        return new DefaultAccessDeniedHandler(securityProperties.getAuth_web());
+        return new DefaultAccessDeniedHandler(securityProperties);
     }
 
     @Bean("customAuthenticationEntryPoint")
     public ServerAuthenticationEntryPoint authenticationEntryPoint() {
-        return new DefaultUnauthorizedEntryPoint(securityProperties.getAuth_web());
+        return new DefaultUnauthorizedEntryPoint(securityProperties);
     }
 
     @Bean("customErrorWebFilter")
@@ -106,11 +100,6 @@ public abstract class SecurityWorkbin {
                 }
             }
         });
-    }
-
-    @Bean
-    public ILookupClient lookupClient() {
-        return new DefaultLookupClient(securityProperties.getClients());
     }
 
     @Bean("customAuthenticationWebFilter")

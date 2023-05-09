@@ -49,7 +49,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-
         DefaultClientCredentialsTokenEndpointFilter endpointFilter = new DefaultClientCredentialsTokenEndpointFilter(security);
         endpointFilter.afterPropertiesSet();
         endpointFilter.setAuthenticationEntryPoint(securityWorkbin.authenticationEntryPoint());

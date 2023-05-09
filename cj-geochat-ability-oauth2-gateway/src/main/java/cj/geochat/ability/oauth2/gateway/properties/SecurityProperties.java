@@ -11,15 +11,12 @@ import java.util.List;
 @Setter
 @Getter
 public class SecurityProperties {
-    AuthWebInfo auth_web;
-    AuthServerInfo auth_server;
+    String auth_server;
     List<String> whitelist;
-    List<String> static_resources;
-    List<ClientInfo> clients;
+    List<String> staticlist;
+
     public SecurityProperties() {
         whitelist = new ArrayList<>();
-        static_resources = new ArrayList<>();
-        auth_web = new AuthWebInfo();
-        clients = new ArrayList<>();
+        staticlist = new ArrayList<>();
     }
 }

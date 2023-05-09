@@ -3,15 +3,16 @@ package cj.geochat.ability.oauth2.app;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.security.Principal;
 import java.util.Collection;
 
 public class DefaultAppAuthentication implements Authentication {
-    DefaultAppPrincipal principal;
+    Principal principal;
     Collection<? extends GrantedAuthority> authorities;
     boolean isAuthenticated;
     DefaultAppAuthenticationDetails details;
 
-    public DefaultAppAuthentication(DefaultAppPrincipal principal, DefaultAppAuthenticationDetails details, Collection<? extends GrantedAuthority> authorities) {
+    public DefaultAppAuthentication(Principal principal, DefaultAppAuthenticationDetails details, Collection<? extends GrantedAuthority> authorities) {
         this.principal = principal;
         this.authorities = authorities;
         this.details = details;
@@ -50,6 +51,6 @@ public class DefaultAppAuthentication implements Authentication {
 
     @Override
     public String getName() {
-        return principal == null ? "" : principal.user;
+        return principal == null ? "" : principal.getName();
     }
 }

@@ -35,6 +35,7 @@ public class Oauth2AuthSuccessHandler implements ServerAuthenticationSuccessHand
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
 //        ServerHttpRequest request = webFilterExchange.getExchange().getRequest();
         MultiValueMap<String, String> headerValues = new LinkedMultiValueMap<>(4);
+        headerValues.add("x-from-gateway","true");
         Object principalObj = authentication.getPrincipal();
         String x_principal = "";
         //客户端也可自定一个User来安放登录身份

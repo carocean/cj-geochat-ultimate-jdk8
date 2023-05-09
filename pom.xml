@@ -45,6 +45,7 @@
         <module>cj-geochat-ability-minio</module>
         <module>cj-geochat-ability-mybatis</module>
         <module>cj-geochat-ability-oauth2-common</module>
+        <module>cj-geochat-ability-oauth2-asc</module>
         <module>cj-geochat-ability-oauth2-server</module>
         <module>cj-geochat-ability-oauth2-gateway</module>
         <module>cj-geochat-ability-oauth2-app</module>

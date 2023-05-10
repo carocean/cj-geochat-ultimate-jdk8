@@ -66,9 +66,12 @@ public abstract class SecurityWorkbin {
 
     @Bean("customAuthManagerHandler")
     public ReactiveAuthorizationManager<AuthorizationContext> authManagerHandler() {
-        return new DefaultAuthManagerHandler();
+        ICheckPermission checkPermission=createCheckPermission();
+        return new DefaultAuthManagerHandler(checkPermission);
     }
-
+    protected ICheckPermission createCheckPermission(){
+        return new DefaultCheckPermission();
+    }
     @Bean("customAccessDeniedHandler")
     public DefaultAccessDeniedHandler accessDeniedHandler() {
         return new DefaultAccessDeniedHandler(securityProperties);

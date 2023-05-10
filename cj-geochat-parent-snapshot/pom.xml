@@ -29,6 +29,7 @@
             <dependency>
                 <groupId>cj.geochat</groupId>
                 <artifactId>cj-geochat-ability-config</artifactId>
+                <type>pom</type>
                 <version>1.0.0</version>
             </dependency>
             <dependency>

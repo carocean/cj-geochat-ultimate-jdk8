@@ -79,7 +79,7 @@ public class AscResource extends AbstractResource implements IAscResource {
     @Override
     public void confirmAccess(
             @RequestParam boolean user_oauth_approval,
-            @RequestParam(required = false) boolean scope_all,
+            @RequestParam(name = "scope.all", value = "scope.all", required = false) boolean scope_all,
             HttpServletResponse response
     ) throws IOException {
         feign.Response src = authRemote.confirmAccess(user_oauth_approval, scope_all);
@@ -97,7 +97,7 @@ public class AscResource extends AbstractResource implements IAscResource {
             @RequestParam String client_id,
             @RequestParam String client_secret,
             @RequestParam String redirect_uri,
-            @RequestParam HttpServletResponse response
+           HttpServletResponse response
     ) throws IOException {
         feign.Response src = authRemote.tokenAuthorizationCode("authorization_code", code, client_id, client_secret, redirect_uri);
         doResponse(src, response);
@@ -110,11 +110,10 @@ public class AscResource extends AbstractResource implements IAscResource {
             @ApiResponse(responseCode = "2001", description = "")})
     @Override
     public void tokenClientCredentials(
-            @RequestParam String grant_type,
             @RequestParam String scopes,
             HttpServletResponse response
     ) throws IOException {
-        feign.Response src = authRemote.tokenClientCredentials(grant_type, scopes);
+        feign.Response src = authRemote.tokenClientCredentials("client_credentials", scopes);
         doResponse(src, response);
     }
 

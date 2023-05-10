@@ -16,7 +16,7 @@ public interface IAscResource {
 
     void tokenAuthorizationCode(String code, String client_id, String client_secret, String redirect_uri, HttpServletResponse response) throws IOException;
 
-    void tokenClientCredentials(String grant_type, String scopes, HttpServletResponse response) throws IOException;
+    void tokenClientCredentials(String scopes, HttpServletResponse response) throws IOException;
 
     void tokenPassword(String username, String password, String client_id, String client_secret, String scopes, HttpServletResponse response) throws IOException;
 

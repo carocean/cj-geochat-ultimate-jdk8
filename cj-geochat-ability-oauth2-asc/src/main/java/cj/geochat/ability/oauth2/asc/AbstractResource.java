@@ -7,6 +7,7 @@ import java.util.Map;
 
 public abstract class AbstractResource {
     protected void doResponse(feign.Response in, HttpServletResponse out) throws IOException {
+        out.setStatus(in.status());
         Map<String, Collection<String>> srcHeaders = in.headers();
         for (String key : srcHeaders.keySet()) {
             String v = srcHeaders.get(key).stream().findFirst().get();

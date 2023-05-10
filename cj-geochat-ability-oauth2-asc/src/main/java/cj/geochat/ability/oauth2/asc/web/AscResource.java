@@ -12,8 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,9 +32,9 @@ public class AscResource extends AbstractResource implements IAscResource {
     @ApiOperation("登录")
     @ApiResponses({@ApiResponse(responseCode = "2030", description = "is_authorized")})
     @Override
-    public void login(@RequestParam String username, @RequestParam String password, HttpServletResponse response) throws IOException {
+    public void login(@RequestParam String username, @RequestParam String password, HttpServletRequest request, HttpServletResponse response) throws IOException {
         feign.Response src = authRemote.login(username, password);
-        doResponse(src, response);
+        doResponse(src, request, response);
     }
 
     @GetMapping("/oauth/authorize/code")
@@ -48,10 +48,11 @@ public class AscResource extends AbstractResource implements IAscResource {
             @RequestParam(required = false) String scope,
             @RequestParam(required = false) String redirect_uri,
             @RequestParam(required = false) String state,
+            HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
         feign.Response src = authRemote.authorize("code", client_id, scope, redirect_uri, state);
-        doResponse(src, response);
+        doResponse(src, request, response);
     }
 
     @GetMapping("/oauth/authorize/token")
@@ -65,10 +66,11 @@ public class AscResource extends AbstractResource implements IAscResource {
             @RequestParam(required = false) String scope,
             @RequestParam(required = false) String redirect_uri,
             @RequestParam(required = false) String state,
+            HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
         feign.Response src = authRemote.authorize("token", client_id, scope, redirect_uri, state);
-        doResponse(src, response);
+        doResponse(src, request, response);
     }
 
     @PostMapping("/oauth/confirm_access")
@@ -80,10 +82,11 @@ public class AscResource extends AbstractResource implements IAscResource {
     public void confirmAccess(
             @RequestParam boolean user_oauth_approval,
             @RequestParam(name = "scope.all", value = "scope.all", required = false) boolean scope_all,
+            HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
         feign.Response src = authRemote.confirmAccess(user_oauth_approval, scope_all);
-        doResponse(src, response);
+        doResponse(src, request, response);
     }
 
     @PostMapping("/oauth/token/authorization_code")
@@ -97,10 +100,11 @@ public class AscResource extends AbstractResource implements IAscResource {
             @RequestParam String client_id,
             @RequestParam String client_secret,
             @RequestParam String redirect_uri,
-           HttpServletResponse response
+            HttpServletRequest request,
+            HttpServletResponse response
     ) throws IOException {
         feign.Response src = authRemote.tokenAuthorizationCode("authorization_code", code, client_id, client_secret, redirect_uri);
-        doResponse(src, response);
+        doResponse(src, request, response);
     }
 
     @PostMapping("/oauth/token/client_credentials")
@@ -111,10 +115,11 @@ public class AscResource extends AbstractResource implements IAscResource {
     @Override
     public void tokenClientCredentials(
             @RequestParam String scopes,
+            HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
         feign.Response src = authRemote.tokenClientCredentials("client_credentials", scopes);
-        doResponse(src, response);
+        doResponse(src, request, response);
     }
 
     @PostMapping("/oauth/token/password")
@@ -129,10 +134,11 @@ public class AscResource extends AbstractResource implements IAscResource {
             @RequestParam String client_id,
             @RequestParam String client_secret,
             @RequestParam(required = false) String scopes,
+            HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
         feign.Response src = authRemote.tokenPassword("password", username, password, client_id, client_secret, scopes);
-        doResponse(src, response);
+        doResponse(src, request, response);
     }
 
     @PostMapping("/oauth/token/sms_code")
@@ -147,10 +153,11 @@ public class AscResource extends AbstractResource implements IAscResource {
             @RequestParam String client_id,
             @RequestParam String client_secret,
             @RequestParam(required = false) String scopes,
+            HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
         feign.Response src = authRemote.tokenSmsCode("sms_code", phone_num, sms_code, client_id, client_secret, scopes);
-        doResponse(src, response);
+        doResponse(src, request, response);
     }
 
     @PostMapping("/oauth/token/tenant_code")
@@ -165,10 +172,11 @@ public class AscResource extends AbstractResource implements IAscResource {
             @RequestParam String client_id,
             @RequestParam String client_secret,
             @RequestParam(required = false) String scopes,
+            HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
         feign.Response src = authRemote.tokenTenantCode("tenant_code", tenantid, access_token, client_id, client_secret, scopes);
-        doResponse(src, response);
+        doResponse(src, request, response);
     }
 
     @PostMapping("/oauth/token/refresh_token")
@@ -181,10 +189,11 @@ public class AscResource extends AbstractResource implements IAscResource {
             @RequestParam String client_id,
             @RequestParam String client_secret,
             @RequestParam String refresh_token,
+            HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
         feign.Response src = authRemote.refreshToken("refresh_token", client_id, client_secret, refresh_token);
-        doResponse(src, response);
+        doResponse(src, request, response);
     }
 
     @GetMapping("/oauth/token/check_token")
@@ -195,9 +204,10 @@ public class AscResource extends AbstractResource implements IAscResource {
     @Override
     public void checkToken(
             @RequestParam String token,
+            HttpServletRequest request,
             HttpServletResponse response) throws IOException {
         feign.Response src = authRemote.checkToken(token);
-        doResponse(src, response);
+        doResponse(src, request, response);
     }
 
     @GetMapping("/logout")
@@ -206,9 +216,11 @@ public class AscResource extends AbstractResource implements IAscResource {
     @ApiResponses({@ApiResponse(responseCode = "2000", description = "ok"),
             @ApiResponse(responseCode = "2001", description = "")})
     @Override
-    public void logout(@RequestParam String access_token, HttpServletResponse response) throws IOException {
+    public void logout(@RequestParam String access_token,
+                       HttpServletRequest request,
+                       HttpServletResponse response) throws IOException {
         feign.Response src = authRemote.logout(access_token);
-        doResponse(src, response);
+        doResponse(src, request, response);
     }
 
     @GetMapping("/auth_page_address")
@@ -217,7 +229,8 @@ public class AscResource extends AbstractResource implements IAscResource {
     @ApiResponses({@ApiResponse(responseCode = "2000", description = "ok"),
             @ApiResponse(responseCode = "2001", description = "")})
     @Override
-    public Map<String, Object> getAuthPageAddress(HttpServletResponse response) throws IOException {
+    public Map<String, Object> getAuthPageAddress(
+    ) throws IOException {
         feign.Response src = authRemote.getAuthPageAddress();
         return new ObjectMapper().readValue(readFully(src), HashMap.class);
     }
@@ -228,7 +241,7 @@ public class AscResource extends AbstractResource implements IAscResource {
     @ApiResponses({@ApiResponse(responseCode = "2000", description = "ok"),
             @ApiResponse(responseCode = "2001", description = "")})
     @Override
-    public List<String> getSupportsGrantTypes(HttpServletResponse response) throws IOException {
+    public List<String> getSupportsGrantTypes() throws IOException {
         feign.Response src = authRemote.getSupportsGrantTypes();
         return new ObjectMapper().readValue(readFully(src), ArrayList.class);
     }

@@ -48,6 +48,7 @@
         <module>cj-geochat-ability-oauth2-server</module>
         <module>cj-geochat-ability-oauth2-gateway</module>
         <module>cj-geochat-ability-oauth2-app</module>
+        <module>cj-geochat-ability-oauth2-asc</module>
         <module>cj-geochat-parent</module>
         <module>cj-geochat-parent-snapshot</module>
     </modules>

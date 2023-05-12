@@ -4,12 +4,9 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
 import org.springframework.util.AntPathMatcher;
 import reactor.core.publisher.Mono;
-
-import java.util.Collection;
 
 public class DefaultAuthManagerHandler implements ReactiveAuthorizationManager<AuthorizationContext> {
     ICheckPermission checkPermission;
@@ -32,7 +29,7 @@ public class DefaultAuthManagerHandler implements ReactiveAuthorizationManager<A
 //            roles.add("ROLE_common");
 //        }
 //        roles.add("ROLE_admin");
-         authentication.map(auth -> auth.getAuthorities());
+        authentication.map(auth -> auth.getAuthorities());
         return authentication
                 .filter(a -> a.isAuthenticated())
                 .flatMapIterable(a -> a.getAuthorities())
@@ -42,7 +39,7 @@ public class DefaultAuthManagerHandler implements ReactiveAuthorizationManager<A
 //                        return true;
 //                    }
                     if (checkPermission != null) {
-                        return checkPermission.check(antPathMatcher,requestUrl, String.valueOf(c));
+                        return checkPermission.check(antPathMatcher, String.valueOf(c), requestUrl);
                     }
                     return true;
                 })

@@ -1,12 +1,19 @@
 package cj.geochat.ability.util;
 
 public class GeochatException extends Exception {
+    String code;
+
     public GeochatException(String code, String message) {
-        super(String.format("%s %s", code, message));
+        super(message);
+        this.code = code;
     }
 
     public GeochatException(String code, Throwable e) {
-        super(String.format("%s %s", code, e.getMessage()), e);
+        super(e.getMessage(), e);
+        this.code = code;
     }
 
+    public String getCode() {
+        return code;
+    }
 }

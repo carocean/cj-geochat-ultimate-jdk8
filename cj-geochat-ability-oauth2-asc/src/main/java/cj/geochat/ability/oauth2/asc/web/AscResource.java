@@ -7,6 +7,7 @@ import cj.geochat.ability.oauth2.asc.IAuthRemote;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +116,8 @@ public class AscResource extends AbstractResource implements IAscResource {
     @Override
     public void tokenClientCredentials(
             @RequestParam String scopes,
+//            @ApiParam(required = false, name = "此为显示传参。也可在请求头中使用Authorization=Basic Auth传入client_id, client_secret")
+//            @RequestHeader String Authorization,
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {

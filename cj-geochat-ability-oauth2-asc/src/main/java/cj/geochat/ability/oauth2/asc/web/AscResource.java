@@ -109,7 +109,7 @@ public class AscResource extends AbstractResource implements IAscResource {
 
     @PostMapping("/oauth/token/client_credentials")
     @ApiResult
-    @ApiOperation("客户端凭证模式获取令牌")
+    @ApiOperation("客户端凭证模式获取令牌。需要在请求头中使用Authorization=Basic Auth传入client_id, client_secret")
     @ApiResponses({@ApiResponse(responseCode = "2000", description = "ok"),
             @ApiResponse(responseCode = "2001", description = "")})
     @Override

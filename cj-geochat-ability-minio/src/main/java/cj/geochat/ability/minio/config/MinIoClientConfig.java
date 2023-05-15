@@ -3,6 +3,7 @@ package cj.geochat.ability.minio.config;
 import cj.geochat.ability.minio.INetDiskService;
 import cj.geochat.ability.minio.service.NetDiskService;
 import io.minio.MinioClient;
+import io.minio.admin.MinioAdminClient;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -32,7 +33,13 @@ public class MinIoClientConfig {
                 .credentials(accessKey, secretKey)
                 .build();
     }
-
+    @Bean
+    public MinioAdminClient minioAdminClient() {
+        return MinioAdminClient.builder()
+                .endpoint(endpoint)
+                .credentials(accessKey, secretKey)
+                .build();
+    }
     @Bean
     public INetDiskService netDiskService() {
         return new NetDiskService();

@@ -1,13 +1,18 @@
 package cj.geochat.ability.minio.service;
 
-import cj.geochat.ability.api.exception.ApiException;
 import cj.geochat.ability.minio.INetDiskService;
 import cj.geochat.ability.minio.util.FilePath;
+import cj.geochat.ability.util.GeochatException;
+import cj.geochat.util.minio.MinioQuotaUnit;
+import com.google.gson.Gson;
 import io.minio.*;
+import io.minio.admin.MinioAdminClient;
+import io.minio.admin.QuotaUnit;
 import io.minio.errors.ErrorResponseException;
 import io.minio.http.Method;
 import io.minio.messages.Item;
 import lombok.SneakyThrows;
+import lombok.var;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,12 +22,77 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class NetDiskService implements INetDiskService {
     @Resource
     MinioClient minioClient;
+    @Resource
+    MinioAdminClient minioAdminClient;
+
+    /**
+     * 创建网盘。对应minio的桶
+     *
+     * @param diskName
+     */
+    @SneakyThrows
+    @Override
+    public void createDisk(String diskName, long size, MinioQuotaUnit unit) {
+        minioClient.makeBucket(
+                MakeBucketArgs.builder()
+                        .bucket(diskName)
+                        .build()
+        );
+        if (size > 0) {
+            minioAdminClient.setBucketQuota(diskName, size, QuotaUnit.valueOf(unit.name()));
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public void setDiskQuota(String diskName, long size, MinioQuotaUnit unit) {
+        if (size <= 0) {
+            throw new GeochatException("5000", "size cannot be less than or equal to zero");
+        }
+        minioAdminClient.setBucketQuota(diskName, size, QuotaUnit.valueOf(unit.name()));
+    }
+
+    @SneakyThrows
+    @Override
+    public void clearDiskQuota(String diskName) {
+        minioAdminClient.clearBucketQuota(diskName);
+    }
+
+    @SneakyThrows
+    @Override
+    public String queryDiskPolicy(String diskName) {
+        return minioClient.getBucketPolicy(GetBucketPolicyArgs.builder().bucket(diskName).build());
+    }
+
+    @SneakyThrows
+    @Override
+    public long getDiskQuota(String diskName) {
+        return minioAdminClient.getBucketQuota(diskName);
+    }
+
+    @SneakyThrows
+    @Override
+    public Map<String, Object> getDataUsageInfo() {
+        var info = minioAdminClient.getDataUsageInfo();
+        var om = new Gson();
+        var json = om.toJson(info);
+        return om.fromJson(json, HashMap.class);
+    }
+
+    @SneakyThrows
+    public void ss() {
+        minioClient.setBucketPolicy(SetBucketPolicyArgs.builder().
+                bucket("")
+                .build());
+    }
 
     /**
      * 创建目录，如果是文件则报错
@@ -34,14 +104,10 @@ public class NetDiskService implements INetDiskService {
     public void mkdir(String path) {
         FilePath filePath = FilePath.parse(path);
         if (filePath.isFile()) {
-            throw new ApiException("4005", "The path is path of file.");
+            throw new GeochatException("4005", "The path is path of file.");
         }
         if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(filePath.getBucketName()).build())) {
-            minioClient.makeBucket(
-                    MakeBucketArgs.builder()
-                            .bucket(filePath.getBucketName())
-                            .build()
-            );
+            throw new GeochatException("4004", String.format("The network disk %s does not exist.", filePath.getBucketName()));
         }
         for (String objectName : filePath.listRelativePath()) {
             putDirObject(filePath.getBucketName(), objectName);
@@ -87,7 +153,7 @@ public class NetDiskService implements INetDiskService {
     @SneakyThrows
     public InputStream readFile(FilePath filePath) {
         if (!filePath.isFile()) {
-            throw new ApiException("4005", "The path is not a file");
+            throw new GeochatException("4005", "The path is not a file");
         }
         String objectName = filePath.getRelativePath();
         while (objectName.startsWith("/")) {
@@ -108,7 +174,7 @@ public class NetDiskService implements INetDiskService {
     @SneakyThrows
     public InputStream readFile(FilePath filePath, long offset, long length) {
         if (!filePath.isFile()) {
-            throw new ApiException("4005", "The path is not a file");
+            throw new GeochatException("4005", "The path is not a file");
         }
         String objectName = filePath.getRelativePath();
         while (objectName.startsWith("/")) {
@@ -130,10 +196,10 @@ public class NetDiskService implements INetDiskService {
     public void writeFile(MultipartFile file, String path) {
         FilePath filePath = FilePath.parse(path);
         if (!FilePath.isDir(path)) {
-            throw new ApiException("4005", "The path is not a directory.");
+            throw new GeochatException("4005", "The path is not a directory.");
         }
         if (!existsDir(filePath.getBucketName(), filePath.getRelativePath())) {
-            throw new ApiException("4004", "The path does not exists.");
+            throw new GeochatException("4004", "The path does not exists.");
         }
         String objectName = filePath.getRelativePath();
         while (objectName.startsWith("/")) {
@@ -141,7 +207,7 @@ public class NetDiskService implements INetDiskService {
         }
         objectName = String.format("%s%s", objectName, file.getOriginalFilename());
         if (existsFile(filePath.getBucketName(), objectName)) {
-            throw new ApiException("4005", "The file already exist.");
+            throw new GeochatException("4005", "The file already exist.");
         }
         InputStream inputStream = file.getInputStream(); //文件流
         minioClient.putObject(PutObjectArgs.builder() //使用minio客户端put方法
@@ -158,10 +224,10 @@ public class NetDiskService implements INetDiskService {
     public void writeFile(File file, String path) {
         FilePath filePath = FilePath.parse(path);
         if (!FilePath.isDir(path)) {
-            throw new ApiException("4005", "The path is not a directory.");
+            throw new GeochatException("4005", "The path is not a directory.");
         }
         if (!existsDir(filePath.getBucketName(), filePath.getRelativePath())) {
-            throw new ApiException("4004", "The path does not exists.");
+            throw new GeochatException("4004", "The path does not exists.");
         }
         String objectName = filePath.getRelativePath();
         while (objectName.startsWith("/")) {
@@ -170,7 +236,7 @@ public class NetDiskService implements INetDiskService {
 
         objectName = String.format("%s%s", objectName, file.getName());
         if (existsFile(filePath.getBucketName(), objectName)) {
-            throw new ApiException("4005", "The file already exist.");
+            throw new GeochatException("4005", "The file already exist.");
         }
         InputStream inputStream = new FileInputStream(file); //文件流
         minioClient.putObject(PutObjectArgs.builder() //使用minio客户端put方法
@@ -275,7 +341,7 @@ public class NetDiskService implements INetDiskService {
     public void empty(String path) {
         FilePath filePath = FilePath.parse(path);
         if (!filePath.isDir()) {
-            throw new ApiException("4005", "the path is not a directory.");
+            throw new GeochatException("4005", "the path is not a directory.");
         }
         String objectName = filePath.getRelativePath();
         while (objectName.startsWith("/")) {
@@ -352,7 +418,7 @@ public class NetDiskService implements INetDiskService {
             objectName = objectName.substring(1);
         }
         if ("".equals(objectName)) {
-            throw new ApiException("4005", "The path is empty.");
+            throw new GeochatException("4005", "The path is empty.");
         }
         if (expirySeconds < 0) {
             return minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs

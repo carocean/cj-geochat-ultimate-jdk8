@@ -16,7 +16,13 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <io.minio.version>8.0.3</io.minio.version>
+        <io.minio.version>8.5.2</io.minio.version>
+        <io.minio.admin.version>8.5.2</io.minio.admin.version>
+        <!-- 覆盖springboot中okhttp3的旧版本声明，解决minio 8.3.x的依赖冲突
+        minio中的okhttp3版本可在minio的pom中拷贝到这里覆盖掉spring的
+        注意：在引用的工程的pom里也要加上此行覆盖
+        -->
+        <okhttp3.version>4.10.0</okhttp3.version>
     </properties>
     <dependencies>
         <dependency>
@@ -29,8 +35,22 @@
             <version>${io.minio.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio-admin</artifactId>
+            <version>${io.minio.admin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
             <groupId>cj.geochat</groupId>
             <artifactId>cj-geochat-ability-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>cj.geochat</groupId>
+            <artifactId>cj-geochat-util-minio</artifactId>
             <version>1.0.0</version>
         </dependency>
     </dependencies>

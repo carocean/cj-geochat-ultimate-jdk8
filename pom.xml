@@ -37,7 +37,7 @@
         <module>cj-geochat-ability-swagger</module>
         <module>cj-geochat-ability-redis</module>
         <module>cj-geochat-ability-api</module>
-        <module>cj-geochat-baility-banner</module>
+        <module>cj-geochat-ability-banner</module>
         <module>cj-geochat-ability-config</module>
         <module>cj-geochat-ability-elasticsearch</module>
         <module>cj-geochat-ability-eureka</module>
@@ -52,6 +52,7 @@
         <module>cj-geochat-ability-util</module>
         <module>cj-geochat-parent</module>
         <module>cj-geochat-parent-snapshot</module>
+        <module>cj-geochat-util-minio</module>
     </modules>
     <dependencies>
         <dependency>

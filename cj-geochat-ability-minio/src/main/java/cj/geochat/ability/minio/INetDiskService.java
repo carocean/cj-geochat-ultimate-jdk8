@@ -1,6 +1,7 @@
 package cj.geochat.ability.minio;
 
 import cj.geochat.ability.minio.util.FilePath;
+import cj.geochat.util.minio.MinioQuotaUnit;
 import io.minio.StatObjectResponse;
 import lombok.SneakyThrows;
 import org.springframework.web.multipart.MultipartFile;
@@ -8,8 +9,27 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 public interface INetDiskService {
+    @SneakyThrows
+    void createDisk(String diskName, long size, MinioQuotaUnit unit);
+
+    @SneakyThrows
+    void setDiskQuota(String diskName, long size, MinioQuotaUnit unit);
+
+    @SneakyThrows
+    void clearDiskQuota(String diskName);
+
+    @SneakyThrows
+    String queryDiskPolicy(String diskName);
+
+    @SneakyThrows
+    long getDiskQuota(String diskName);
+
+    @SneakyThrows
+    Map<String, Object> getDataUsageInfo();
+
     @SneakyThrows
     void mkdir(String path);
 

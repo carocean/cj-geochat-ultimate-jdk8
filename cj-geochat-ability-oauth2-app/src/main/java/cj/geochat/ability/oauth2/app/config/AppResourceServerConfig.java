@@ -10,6 +10,7 @@ import cj.geochat.ability.oauth2.common.ResultCodeTranslator;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -39,9 +40,14 @@ import java.util.List;
 public class AppResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Autowired(required = false)
     AuthenticationProvider authenticationProvider;
+    @Value("${spring.application.name}")
+    String resource_id;
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+        if (StringUtils.hasText(resource_id)) {
+            resources.resourceId(resource_id);
+        }
         resources.stateless(false)
                 .authenticationEntryPoint((request, response, authException) -> {
                     response.setContentType(MediaType.APPLICATION_JSON_VALUE);

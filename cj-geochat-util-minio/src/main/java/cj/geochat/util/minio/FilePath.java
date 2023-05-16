@@ -1,6 +1,6 @@
-package cj.geochat.ability.minio.util;
+package cj.geochat.util.minio;
 
-import cj.geochat.ability.api.exception.ApiException;
+import cj.geochat.ability.util.GeochatRuntimeException;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
 
@@ -20,11 +20,14 @@ public class FilePath {
     public static FilePath parse(String path) {
         String old = path;
         if (!StringUtils.hasText(path)) {
-            throw new ApiException("4004", "The path Parameter is null.");
+            throw new GeochatRuntimeException("4004", "The path Parameter is null.");
+        }
+        if (path.indexOf("-+=")>-1) {
+            throw new GeochatRuntimeException("500","Incorrect path format.");
         }
         int pos = path.indexOf("://");
         if (pos < 1) {
-            throw new ApiException("4004", "The protocol is null in the path.");
+            throw new GeochatRuntimeException("4004", "The protocol is null in the path.");
         }
         String protocol = path.substring(0, pos);
         path = path.substring(pos + 3);
@@ -41,7 +44,7 @@ public class FilePath {
             rPath = trimStart(path);
         }
         if (!StringUtils.hasText(bucketName)) {
-            throw new ApiException("4004", "The bucketName is null.");
+            throw new GeochatRuntimeException("4004", "The bucketName is null.");
         }
         if (StringUtils.hasText(rPath) && !isFile(rPath) && !rPath.endsWith("/")) {
             rPath = rPath + "/";

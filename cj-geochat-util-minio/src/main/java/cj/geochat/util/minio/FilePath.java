@@ -109,7 +109,7 @@ public class FilePath {
     }
 
     public String getRelativePathWithoutFile() {
-        String p = path;
+        String p = getRelativePath();
         if (p.endsWith("/")) {
             return p;
         }

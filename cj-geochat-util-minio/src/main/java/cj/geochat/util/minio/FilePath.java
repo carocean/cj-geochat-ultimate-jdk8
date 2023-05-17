@@ -22,8 +22,8 @@ public class FilePath {
         if (!StringUtils.hasText(path)) {
             throw new GeochatRuntimeException("4004", "The path Parameter is null.");
         }
-        if (path.indexOf("-+=")>-1) {
-            throw new GeochatRuntimeException("500","Incorrect path format.");
+        if (path.indexOf("-+=") > -1) {
+            throw new GeochatRuntimeException("500", "Incorrect path format.");
         }
         int pos = path.indexOf("://");
         if (pos < 1) {
@@ -108,6 +108,23 @@ public class FilePath {
         return p;
     }
 
+    public String getRelativePathWithoutFile() {
+        String p = path;
+        if (p.endsWith("/")) {
+            return p;
+        }
+        int pos = p.lastIndexOf("/");
+        if (pos <= 0) {
+            return p;
+        }
+        String ret = p.substring(0, pos);
+        String remaining = p.substring(pos, p.length());
+        if (remaining.lastIndexOf(".") >= 0) {
+            return ret;
+        } else {
+            return p;
+        }
+    }
 
     public List<String> listRelativePath() {
         String rPath = relativePath;

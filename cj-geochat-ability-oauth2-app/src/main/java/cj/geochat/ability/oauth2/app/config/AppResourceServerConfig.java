@@ -7,6 +7,7 @@ import cj.geochat.ability.oauth2.app.DefaultAppAuthenticationDetails;
 import cj.geochat.ability.oauth2.app.DefaultTenantPrincipal;
 import cj.geochat.ability.oauth2.app.DefaultAppPrincipal;
 import cj.geochat.ability.oauth2.common.ResultCodeTranslator;
+import cj.geochat.ability.util.GeochatRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,14 +66,15 @@ public class AppResourceServerConfig extends ResourceServerConfigurerAdapter {
                             return extractSwaggerToken(swaggerToken, isBoolFromGateway, request);
                         }
                     }
-                    String user = request.getHeader("x-user");
-                    if (!StringUtils.hasText(user)) {//这说明是内部访问（不是经过网关的请求），改为匿名访问，除非使用swagger_token。
-                        Principal principal = new DefaultAppPrincipal("anonymous_user", "anonymous_appid");
+                    String opencode = request.getHeader("x-opencode");
+                    if (!StringUtils.hasText(opencode)) {//这说明是内部访问（不是经过网关的请求），改为匿名访问，除非使用swagger_token。
+                        Principal principal = new DefaultAppPrincipal("anonymous_opencode", "anonymous_user", "anonymous_appid");
                         DefaultAppAuthenticationDetails details = new DefaultAppAuthenticationDetails(isBoolFromGateway, request);
                         Authentication authentication = new DefaultAppAuthentication(principal, details, new ArrayList<>());
                         return authentication;
                     }
-                    String appid = request.getHeader("x-appid");
+                    String userid = request.getHeader("x-userid");
+                    String appkey = request.getHeader("x-appkey");
                     List<GrantedAuthority> authorityList = new ArrayList<>();
                     String roles = request.getHeader("x-roles");
                     if (StringUtils.hasText(roles)) {
@@ -82,7 +84,7 @@ public class AppResourceServerConfig extends ResourceServerConfigurerAdapter {
                         }
                     }
                     String tenantid = request.getHeader("x-tenantid");
-                    Principal principal = StringUtils.hasText(tenantid) ? new DefaultTenantPrincipal(user, appid, tenantid) : new DefaultAppPrincipal(user, appid);
+                    Principal principal = StringUtils.hasText(tenantid) ? new DefaultTenantPrincipal(opencode, userid, appkey, tenantid) : new DefaultAppPrincipal(opencode, userid, appkey);
                     DefaultAppAuthenticationDetails details = new DefaultAppAuthenticationDetails(isBoolFromGateway, request);
                     Authentication authentication = new DefaultAppAuthentication(principal, details, authorityList);
                     return authentication;
@@ -93,18 +95,27 @@ public class AppResourceServerConfig extends ResourceServerConfigurerAdapter {
     }
 
     private Authentication extractSwaggerToken(String swaggerToken, boolean isFromGateway, HttpServletRequest request) {
-        //租户标识::应用标识::用户::角色1,角色2
+        //租户标识::应用标识::登录账号.用户标识::角色1,角色2
         String[] terms = swaggerToken.split("::");
         if (terms.length != 4 && terms.length != 3) {
             String err = "swagger_token格式不正确，抽取令牌过程被中止，正确格式：租户标识::应用标识::用户::角色1,角色2，如果某项为空但::分隔不能少";
             log.warn(err);
-            throw new RuntimeException(err);
+            throw new GeochatRuntimeException("5001", err);
         }
         String user = terms[2];
         if (!StringUtils.hasText(user)) {
-            throw new RuntimeException("swagger_token is not contain a user.");
+            throw new GeochatRuntimeException("5000", "swagger_token is not contain a user.");
         }
-        String appid = terms[1];
+        int pos = user.lastIndexOf(".");
+        String opencode = "";
+        String userid = "";
+        if (pos < 0) {
+            opencode = user;
+        } else {
+            opencode = user.substring(0, pos);
+            userid = user.substring(pos+1, user.length());
+        }
+        String appkey = terms[1];
         List<GrantedAuthority> authorityList = new ArrayList<>();
 
         if (terms.length == 4) {
@@ -117,7 +128,7 @@ public class AppResourceServerConfig extends ResourceServerConfigurerAdapter {
             }
         }
         String tenantid = terms[0];
-        Principal principal = StringUtils.hasText(tenantid) ? new DefaultTenantPrincipal(user, appid, tenantid) : new DefaultAppPrincipal(user, appid);
+        Principal principal = StringUtils.hasText(tenantid) ? new DefaultTenantPrincipal(opencode, userid, appkey, tenantid) : new DefaultAppPrincipal(opencode, userid, appkey);
         DefaultAppAuthenticationDetails details = new DefaultAppAuthenticationDetails(isFromGateway, request);
         Authentication authentication = new DefaultAppAuthentication(principal, details, authorityList);
         return authentication;

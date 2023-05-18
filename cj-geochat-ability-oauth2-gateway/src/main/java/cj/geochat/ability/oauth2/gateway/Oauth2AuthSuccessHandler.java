@@ -1,5 +1,6 @@
 package cj.geochat.ability.oauth2.gateway;
 
+import cj.geochat.ability.oauth2.userdetails.GeochatUser;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,35 +28,44 @@ import java.util.Map;
 //y认证成功之后走这个
 public class Oauth2AuthSuccessHandler implements ServerAuthenticationSuccessHandler {
     ITenantStore tenantStore;
+
     public Oauth2AuthSuccessHandler(ITenantStore tenantStore) {
-        this.tenantStore=tenantStore;
+        this.tenantStore = tenantStore;
     }
 
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
 //        ServerHttpRequest request = webFilterExchange.getExchange().getRequest();
         MultiValueMap<String, String> headerValues = new LinkedMultiValueMap<>(4);
-        headerValues.add("x-from-gateway","true");
+        headerValues.add("x-from-gateway", "true");
         Object principalObj = authentication.getPrincipal();
         String x_principal = "";
+        String x_userid = "";
         //客户端也可自定一个User来安放登录身份
         if (principalObj instanceof User) {
-            User user = (User) principalObj;
-            x_principal = user.getUsername();
+            if (principalObj instanceof GeochatUser) {
+                GeochatUser user = (GeochatUser) principalObj;
+                x_principal = user.getUsername();
+                x_userid = user.getUserId();
+            }else {
+                User user = (User) principalObj;
+                x_principal = user.getUsername();
+            }
         } else {
             x_principal = principalObj + "";
         }
-        headerValues.add("x-user", x_principal);
+        headerValues.add("x-opencode", x_principal);
+        headerValues.add("x-userid", x_userid);
         OAuth2Authentication oauth2Authentication = (OAuth2Authentication) authentication;
         String clientId = oauth2Authentication.getOAuth2Request().getClientId();
-        headerValues.add("x-appid", clientId);
+        headerValues.add("x-appkey", clientId);
 
         //从认证服务器过来，如果认证服务器通过了租户认证则会有details
         Map<String, Object> details = (Map<String, Object>) authentication.getDetails();
         String tenantid = details == null ? "" : (String) details.getOrDefault("tenantid", "");
         if (!StringUtils.hasText(tenantid)) {
             String platformClientId = "platform";
-            tenantid = tenantStore.readTenantId(x_principal,platformClientId);
+            tenantid = tenantStore.readTenantId(x_principal, platformClientId);
         }
         headerValues.set("x-tenantid", tenantid);
 

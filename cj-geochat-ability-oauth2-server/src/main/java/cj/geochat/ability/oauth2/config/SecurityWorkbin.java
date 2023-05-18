@@ -80,12 +80,10 @@ public abstract class SecurityWorkbin {
     public AuthorizationCodeServices authCodeStoreServices() {
         return new RedisAuthCodeStoreServices();
     }
-
     @Bean("customSuccessAuthentication")
     public AuthenticationSuccessHandler successAuthentication() {
         return new DefaultSuccessAuthentication();
     }
-
     @Bean("customFailureAuthentication")
     public AuthenticationFailureHandler failureAuthentication() {
         return new DefaultFailureAuthentication();
@@ -151,9 +149,8 @@ public abstract class SecurityWorkbin {
 //        );
 //    }
 
-    @Bean
-    public AbstractAuthenticationProcessingFilter defaultAuthenticationProcessingFilter(AuthenticationManager authenticationManager) {
-        DefaultAuthenticationFilter filter = new DefaultAuthenticationFilter(authenticationManager);
+    public AbstractAuthenticationProcessingFilter defaultAuthenticationProcessingFilter(AuthenticationManager authenticationManager,IGrantTypeAuthenticationFactory factory) {
+        DefaultAuthenticationFilter filter = new DefaultAuthenticationFilter(authenticationManager,factory);
         return filter;
     }
 

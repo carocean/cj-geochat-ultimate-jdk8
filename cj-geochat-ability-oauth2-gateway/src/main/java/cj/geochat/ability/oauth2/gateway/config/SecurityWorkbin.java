@@ -10,19 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.security.oauth2.server.resource.web.server.ServerBearerTokenAuthenticationConverter;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.authentication.ServerAuthenticationEntryPointFailureHandler;
-import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
@@ -82,8 +83,7 @@ public abstract class SecurityWorkbin {
         return new DefaultUnauthorizedEntryPoint(securityProperties);
     }
 
-    @Bean("customErrorWebFilter")
-    WebFilter errorWebFilter() {
+    public WebFilter errorWebFilter() {
         return ((exchange, chain) -> {
             try {
                 return chain.filter(exchange);
@@ -105,7 +105,6 @@ public abstract class SecurityWorkbin {
         });
     }
 
-    @Bean("customAuthenticationWebFilter")
     public AuthenticationWebFilter authenticationWebFilter(TokenStore tokenStore, ITenantStore tenantStore) {
         //认证处理器
         ReactiveAuthenticationManager customAuthenticationManager = new CustomAuthenticationManager(tokenStore);

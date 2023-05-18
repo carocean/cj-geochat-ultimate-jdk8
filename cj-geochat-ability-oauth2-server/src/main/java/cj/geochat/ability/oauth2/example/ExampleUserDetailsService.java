@@ -1,5 +1,7 @@
 package cj.geochat.ability.oauth2.example;
 
+import cj.geochat.ability.oauth2.userdetails.GeochatUser;
+import com.github.f4b6a3.ulid.UlidCreator;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +28,7 @@ public class ExampleUserDetailsService implements UserDetailsService {
         }
         String pwd = passwordEncoder.encode("123456");
         if ("wj".equals(username)) {
-            UserDetails userDetails = new User(username, pwd, true, true, true, true, Arrays.asList(
+            UserDetails userDetails = new GeochatUser(username, UlidCreator.getUlid().toLowerCase(), pwd, true, true, true, true, Arrays.asList(
                     new SimpleGrantedAuthority("commons")
             ));
             return userDetails;

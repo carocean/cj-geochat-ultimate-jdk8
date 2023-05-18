@@ -5,31 +5,40 @@ import org.springframework.util.StringUtils;
 import java.security.Principal;
 
 public class DefaultAppPrincipal implements Principal {
-    String user;
-    String appid;
+
+    String opencode;
+    String userid;
+    String appkey;
 
     public DefaultAppPrincipal() {
     }
 
-    public DefaultAppPrincipal(String user, String appid) {
-        this.user = user;
-        this.appid = appid;
+    public DefaultAppPrincipal(String opencode,String userid, String appkey) {
+        this.opencode = opencode;
+        this.userid=userid;
+        this.appkey = appkey;
     }
 
 
-    public String getAppid() {
-        return appid;
+    public String getAppkey() {
+        return appkey;
     }
 
     @Override
     public String getName() {
-        return user;
+        return opencode;
+    }
+
+    public String getUserid() {
+        return userid;
     }
 
     @Override
     public String toString() {
-        String fullName = (StringUtils.hasText(appid) ? appid + "::" : "")
-                + (StringUtils.hasText(user) ? user : "");
+        String fullName = (StringUtils.hasText(appkey) ? appkey + "::" : "")
+                + (StringUtils.hasText(opencode) ? opencode : "")
+                +(StringUtils.hasText(userid) ? "."+userid : "")
+                ;
         return fullName;
     }
 

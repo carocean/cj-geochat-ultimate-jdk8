@@ -10,8 +10,8 @@ public class DefaultTenantPrincipal extends DefaultAppPrincipal {
     public DefaultTenantPrincipal() {
     }
 
-    public DefaultTenantPrincipal(String user, String appid, String tenantid) {
-        super(user, appid);
+    public DefaultTenantPrincipal(String opencode,String userid, String appkey, String tenantid) {
+        super(opencode,userid, appkey);
         this.tenantid = tenantid;
     }
 

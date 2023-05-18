@@ -19,15 +19,14 @@ import java.io.IOException;
 public class DefaultAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = new AntPathRequestMatcher("/login", "POST");
     private boolean postOnly = true;
-    @Autowired
-    IGrantTypeAuthenticationFactory factory;
 
     public DefaultAuthenticationFilter() {
         super(DEFAULT_ANT_PATH_REQUEST_MATCHER);
     }
-
-    public DefaultAuthenticationFilter(AuthenticationManager authenticationManager) {
+    IGrantTypeAuthenticationFactory factory;
+    public DefaultAuthenticationFilter(AuthenticationManager authenticationManager,IGrantTypeAuthenticationFactory factory) {
         super(DEFAULT_ANT_PATH_REQUEST_MATCHER, authenticationManager);
+        this.factory=factory;
     }
 
     @Override

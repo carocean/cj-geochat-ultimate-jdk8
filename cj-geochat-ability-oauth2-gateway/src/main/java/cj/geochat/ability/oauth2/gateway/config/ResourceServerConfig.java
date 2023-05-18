@@ -1,5 +1,6 @@
 package cj.geochat.ability.oauth2.gateway.config;
 
+import cj.geochat.ability.oauth2.gateway.ITenantStore;
 import cj.geochat.ability.oauth2.gateway.properties.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.web.server.WebFilter;
@@ -29,20 +31,18 @@ public class ResourceServerConfig {
 
     @Autowired(required = false)
     SecurityWorkbin securityWorkbin;
-    @Autowired(required = false)
-    @Qualifier("customAuthenticationWebFilter")
-    AuthenticationWebFilter authenticationWebFilter;
-    @Autowired(required = false)
-    @Qualifier("customErrorWebFilter")
-    WebFilter errorWebFilter;
     @Autowired
     SecurityProperties securityProperties;
+    @Autowired(required = false)
+    TokenStore tokenStore;
+    @Autowired
+    ITenantStore tenantStore;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         //这个filter必须放到前面设置
-        http.addFilterBefore(errorWebFilter, SecurityWebFiltersOrder.FIRST);
-        http.addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION);
+        http.addFilterBefore(securityWorkbin.errorWebFilter(), SecurityWebFiltersOrder.FIRST);
+        http.addFilterAt(securityWorkbin.authenticationWebFilter(tokenStore, tenantStore), SecurityWebFiltersOrder.AUTHENTICATION);
         List<String> whitelist = securityProperties.getWhitelist();
         List<String> staticResources = securityProperties.getStaticlist();
         List<String> allWhitelist = new ArrayList<>();

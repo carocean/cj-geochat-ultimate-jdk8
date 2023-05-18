@@ -1,7 +1,9 @@
 package cj.geochat.ability.oauth2.config;
 
+import cj.geochat.ability.oauth2.grant.IGrantTypeAuthenticationFactory;
 import cj.geochat.ability.oauth2.properties.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +39,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     SecurityProperties securityProperties;
     @Autowired(required = false)
     SecurityWorkbin securityWorkbin;
+    @Autowired
+    AuthenticationSuccessHandler customSuccessAuthentication;
+    @Autowired
+    AuthenticationFailureHandler customFailureAuthentication;
+
+    @Autowired(required = false)
+    IGrantTypeAuthenticationFactory grantTypeAuthenticationFactory;
 
     @Bean
     @Override
@@ -58,11 +67,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        AbstractAuthenticationProcessingFilter filter = securityWorkbin.defaultAuthenticationProcessingFilter(this.authenticationManagerBean());
-        AuthenticationSuccessHandler successHandler = securityWorkbin.successAuthentication();
-        AuthenticationFailureHandler failureHandler = securityWorkbin.failureAuthentication();
-        filter.setAuthenticationSuccessHandler(successHandler);
-        filter.setAuthenticationFailureHandler(failureHandler);
+        AbstractAuthenticationProcessingFilter filter = securityWorkbin.defaultAuthenticationProcessingFilter(super.authenticationManagerBean(), this.grantTypeAuthenticationFactory);
+        filter.setAuthenticationSuccessHandler(customSuccessAuthentication);
+        filter.setAuthenticationFailureHandler(customFailureAuthentication);
         http.addFilterAt(filter, UsernamePasswordAuthenticationFilter.class);
         //"/login", "/oauth/**", "/logout"
         List<String> whitelist = securityProperties.getWhitelist();
@@ -74,7 +81,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(whitelist.toArray(new String[0])).permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().successHandler(successHandler).failureHandler(failureHandler)
+                .formLogin().successHandler(customSuccessAuthentication).failureHandler(customFailureAuthentication)
                 .and().headers().frameOptions().disable()
                 .and()
                 .logout().logoutSuccessHandler(securityWorkbin.logoutSuccessHandler()).clearAuthentication(true).permitAll()

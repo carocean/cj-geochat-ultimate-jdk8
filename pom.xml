@@ -51,8 +51,8 @@
         <module>cj-geochat-ability-oauth2-asc</module>
         <module>cj-geochat-ability-util</module>
         <module>cj-geochat-parent</module>
-        <module>cj-geochat-parent-snapshot</module>
         <module>cj-geochat-util-minio</module>
+        <module>cj-geochat-ability-kafka</module>
     </modules>
     <dependencies>
         <dependency>

@@ -12,6 +12,7 @@
         <option value="$PROJECT_DIR$/cj-geochat-ability-oauth2-asc/cj-geochat-ability-oauth2-asc-framework/pom.xml" />
         <option value="$PROJECT_DIR$/cj-geochat-ability-oauth2-asc/cj-geochat-ability-oauth2-asc-remote/pom.xml" />
         <option value="$PROJECT_DIR$/cj-geochat-ability-oauth2-asc/cj-geochat-ability-oauth2-asc-starter/pom.xml" />
+        <option value="$PROJECT_DIR$/cj-geochat-parent-snapshot/pom.xml" />
       </set>
     </option>
   </component>

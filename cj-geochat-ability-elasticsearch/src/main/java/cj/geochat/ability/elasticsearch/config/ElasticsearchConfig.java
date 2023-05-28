@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -20,12 +21,14 @@ public class ElasticsearchConfig {
 
     @SneakyThrows
     @Bean
+    @ConditionalOnMissingBean
     RestHighLevelClient elasticsearchClient() {
         return workbin.getClientIgnoringCertVerification();
 //        return getClientWithCertVerification();
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public ElasticsearchOperations elasticsearchTemplate() {
         return new ElasticsearchRestTemplate(elasticsearchClient());
     }

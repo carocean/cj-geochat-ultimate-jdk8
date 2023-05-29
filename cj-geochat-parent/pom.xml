@@ -95,6 +95,11 @@
             </dependency>
             <dependency>
                 <groupId>cj.geochat</groupId>
+                <artifactId>cj-geochat-ability-oauth2-frontapp</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>cj.geochat</groupId>
                 <artifactId>cj-geochat-ability-redis</artifactId>
                 <version>1.0.0</version>
             </dependency>

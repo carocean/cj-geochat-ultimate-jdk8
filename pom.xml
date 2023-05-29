@@ -54,6 +54,7 @@
         <module>cj-geochat-util-minio</module>
         <module>cj-geochat-ability-kafka</module>
         <module>cj-geochat-ability-websocket</module>
+        <module>cj-geochat-ability-oauth2-frontapp</module>
     </modules>
     <dependencies>
         <dependency>

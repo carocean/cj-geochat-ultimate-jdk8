@@ -128,8 +128,8 @@ public class AppResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable().logout().disable().formLogin().disable().anonymous().disable()
-                .authorizeRequests()
+        http.cors().and().csrf().disable().logout().disable().formLogin().disable().anonymous().disable().httpBasic().disable()
+                   .authorizeRequests()
                 .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling()

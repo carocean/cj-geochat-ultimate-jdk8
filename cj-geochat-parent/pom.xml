@@ -123,6 +123,11 @@
                 <artifactId>cj-geochat-ability-kafka</artifactId>
                 <version>1.0.0</version>
             </dependency>
+            <dependency>
+                <groupId>cj.geochat</groupId>
+                <artifactId>cj-geochat-ability-websocket</artifactId>
+                <version>1.0.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

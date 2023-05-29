@@ -53,6 +53,7 @@
         <module>cj-geochat-parent</module>
         <module>cj-geochat-util-minio</module>
         <module>cj-geochat-ability-kafka</module>
+        <module>cj-geochat-ability-websocket</module>
     </modules>
     <dependencies>
         <dependency>

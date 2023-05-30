@@ -2,13 +2,12 @@ package cj.geochat.ability.oauth2.frontapp.config;
 
 import cj.geochat.ability.api.R;
 import cj.geochat.ability.api.ResultCode;
+import cj.geochat.ability.api.exception.ApiException;
 import cj.geochat.ability.oauth2.common.ResultCodeTranslator;
 import cj.geochat.ability.oauth2.frontapp.DefaultAppAuthentication;
 import cj.geochat.ability.oauth2.frontapp.DefaultAppAuthenticationDetails;
 import cj.geochat.ability.oauth2.frontapp.DefaultAppPrincipal;
-import cj.geochat.ability.oauth2.frontapp.DefaultTenantPrincipal;
-import cj.geochat.ability.redis.annotation.EnableCjRedis;
-import cj.geochat.ability.redis.config.RedisConfig;
+import cj.geochat.ability.oauth2.userdetails.GeochatUser;
 import cj.geochat.ability.util.GeochatRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -36,13 +35,13 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
-@EnableCjRedis
 @EnableResourceServer
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @ComponentScan({"cj.geochat.ability.oauth2.frontapp"})
-@ConditionalOnBean({RedisConfig.class, AppSecurityWorkbin.class})
+@ConditionalOnBean({AppSecurityWorkbin.class})
 @Slf4j
 public class AppResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Autowired(required = false)
@@ -51,85 +50,51 @@ public class AppResourceServerConfig extends ResourceServerConfigurerAdapter {
     String resource_id;
     @Autowired
     TokenStore tokenStore;
-    @Autowired(required = false)
-    BearerTokenExtractor bearerTokenExtractor;
+    @Autowired
+    BearerTokenExtractor tokenExtractor;
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
         if (StringUtils.hasText(resource_id)) {
             resources.resourceId(resource_id);
         }
-        resources.stateless(false)
+        resources.stateless(true)
                 .authenticationEntryPoint((request, response, authException) -> {
                     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                     ResultCode rc = ResultCodeTranslator.translateException(authException);
                     Object obj = R.of(rc, authException.getMessage());
                     response.getWriter().write(new ObjectMapper().writeValueAsString(obj));
-                }).tokenExtractor((request) -> {
-                    String swaggerToken = request.getHeader("swagger_token");
-                    if (StringUtils.hasText(swaggerToken)) {
-                        return extractSwaggerToken(swaggerToken, false, request);
+                })
+                .tokenStore(tokenStore)
+                .tokenExtractor((request) -> {
+                    String accessToken = request.getHeader("swagger_token");
+                    if (!StringUtils.hasText(accessToken)) {
+                        Authentication PreAuthentication = tokenExtractor.extract(request);
+                        accessToken = (String) PreAuthentication.getPrincipal();
                     }
-
-                    Authentication PreAuthentication = bearerTokenExtractor.extract(request);
-                    String accessToken = (String) PreAuthentication.getPrincipal();
+                    if (!StringUtils.hasText(accessToken)) {
+                        throw new ApiException(ResultCode.INVALID_TOKEN);
+                    }
                     OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(accessToken);
-
-//                    Principal principal =  new DefaultAppPrincipal(opencode, userid, appkey);
-//                    DefaultAppAuthenticationDetails details = new DefaultAppAuthenticationDetails(isBoolFromGateway, request);
-//                    Authentication authentication = new DefaultAppAuthentication(principal, details, authorityList);
-//                    return authentication;
-                    return oAuth2Authentication;
+                    if (oAuth2Authentication == null) {
+                        throw new ApiException(ResultCode.INVALID_TOKEN);
+                    }
+                    GeochatUser user = (GeochatUser) oAuth2Authentication.getPrincipal();
+                    Map<String, String> userDetails = (Map<String, String>) oAuth2Authentication.getUserAuthentication().getDetails();
+                    Principal principal = new DefaultAppPrincipal(user.getUsername(), user.getUserId(), userDetails.get("client_id"));
+                    DefaultAppAuthenticationDetails details = new DefaultAppAuthenticationDetails(false, request);
+                    Authentication authentication = new DefaultAppAuthentication(principal, details, oAuth2Authentication.getUserAuthentication().getAuthorities());
+                    return authentication;
                 })
                 .authenticationManager((authentication ->
                         authenticationProvider.authenticate(authentication)
                 ));
     }
 
-    private Authentication extractSwaggerToken(String swaggerToken, boolean isFromGateway, HttpServletRequest request) {
-        //租户标识::应用标识::登录账号.用户标识::角色1,角色2
-        String[] terms = swaggerToken.split("::");
-        if (terms.length != 4 && terms.length != 3) {
-            String err = "swagger_token格式不正确，抽取令牌过程被中止，正确格式：租户标识::应用标识::用户::角色1,角色2，如果某项为空但::分隔不能少";
-            log.warn(err);
-            throw new GeochatRuntimeException("5001", err);
-        }
-        String user = terms[2];
-        if (!StringUtils.hasText(user)) {
-            throw new GeochatRuntimeException("5000", "swagger_token is not contain a user.");
-        }
-        int pos = user.lastIndexOf(".");
-        String opencode = "";
-        String userid = "";
-        if (pos < 0) {
-            opencode = user;
-        } else {
-            opencode = user.substring(0, pos);
-            userid = user.substring(pos + 1, user.length());
-        }
-        String appkey = terms[1];
-        List<GrantedAuthority> authorityList = new ArrayList<>();
-
-        if (terms.length == 4) {
-            String roles = terms[3];
-            if (StringUtils.hasText(roles)) {
-                String roleArr[] = roles.split(",");
-                for (String role : roleArr) {
-                    authorityList.add(new SimpleGrantedAuthority(role));
-                }
-            }
-        }
-        String tenantid = terms[0];
-        Principal principal = StringUtils.hasText(tenantid) ? new DefaultTenantPrincipal(opencode, userid, appkey, tenantid) : new DefaultAppPrincipal(opencode, userid, appkey);
-        DefaultAppAuthenticationDetails details = new DefaultAppAuthenticationDetails(isFromGateway, request);
-        Authentication authentication = new DefaultAppAuthentication(principal, details, authorityList);
-        return authentication;
-    }
-
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable().logout().disable().formLogin().disable().anonymous().disable().httpBasic().disable()
-                   .authorizeRequests()
+        http.cors().and().csrf().disable().logout().disable().formLogin().disable().anonymous().disable()
+                .authorizeRequests()
                 .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling()

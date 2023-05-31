@@ -35,7 +35,7 @@ import java.util.List;
 @Configuration
 @EnableResourceServer
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@ComponentScan({"cj.geochat.ability.oauth2.app"})
+//@ComponentScan({"cj.geochat.ability.oauth2.app"})
 @ConditionalOnBean({AppSecurityWorkbin.class})
 @Slf4j
 public class AppResourceServerConfig extends ResourceServerConfigurerAdapter {

@@ -21,12 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLContext;
 import java.util.List;
 
-@Component
+@Configuration
 @EnableConfigurationProperties(ElasticProperties.class)
 public class ElasticSearchWorkbin {
     @Autowired
@@ -39,7 +40,7 @@ public class ElasticSearchWorkbin {
         final CredentialsProvider credentialsProvider =
                 new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials("elastic", "elastic123"));
+                new UsernamePasswordCredentials(properties.getUsername(), properties.getPassword()));
 
         SSLContextBuilder sslBuilder = SSLContexts.custom()
                 .loadTrustMaterial(null, (x509Certificates, s) -> true);

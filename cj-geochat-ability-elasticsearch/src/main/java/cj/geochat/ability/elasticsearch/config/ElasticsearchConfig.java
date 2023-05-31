@@ -12,7 +12,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 
 @Configuration
-@ComponentScan(basePackages = "cj.geochat.ability.elasticsearch")
+//@ComponentScan(basePackages = "cj.geochat.ability.elasticsearch")
 @ConditionalOnBean({ElasticSearchWorkbin.class})
 public class ElasticsearchConfig {
 

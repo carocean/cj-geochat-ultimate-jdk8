@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.List;
 
 @Data
-@ConfigurationProperties("spring.data.elasticsearch")
+@ConfigurationProperties("spring.elasticsearch")
 public class ElasticProperties {
     List<String> uris;
     String username;
